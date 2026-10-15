@@ -54,6 +54,8 @@ try_load_ko() {
 OLD_MODPATH="/data/adb/modules/nomount"
 KVER=$(uname -r | cut -d'.' -f1,2)
 AKVER=$(uname -r | grep -oE 'android[0-9]+')
+ARCH_SFX=""
+[ "$ARCH" = "x86_64" ] && ARCH_SFX="-x86_64"
 
 if [ -n "$AKVER" ]; then
   ui_print "- Detected Kernel: $KVER ($AKVER branch)"
@@ -90,13 +92,13 @@ elif [ "$LKM_RUNNING" = true ]; then
   ui_print "  [*] Active LKM detected."
   ui_print "  [*] Verifying new driver (no unload)..."
 
-  EXACT="$MODPATH/lkm/nomount-${AKVER}-${KVER}.ko"
+  EXACT="$MODPATH/lkm/nomount-${AKVER}-${KVER}${ARCH_SFX}.ko"
   CANDIDATE=""
 
   if [ -n "$AKVER" ] && [ -f "$EXACT" ]; then
     CANDIDATE="$EXACT"
   else
-    for mod in "$MODPATH"/lkm/nomount*-${KVER}.ko; do
+    for mod in "$MODPATH"/lkm/nomount*-${KVER}${ARCH_SFX}.ko; do
       [ -f "$mod" ] || continue
       CANDIDATE="$mod"
       break
@@ -126,13 +128,13 @@ elif [ "$LKM_RUNNING" = true ]; then
 else
   ui_print "  [*] Built-in support not found. Attempting LKM injection..."
 
-  EXACT="$MODPATH/lkm/nomount-${AKVER}-${KVER}.ko"
+  EXACT="$MODPATH/lkm/nomount-${AKVER}-${KVER}${ARCH_SFX}.ko"
   CANDIDATE=""
 
   if [ -n "$AKVER" ] && [ -f "$EXACT" ]; then
     CANDIDATE="$EXACT"
   else
-    for mod in "$MODPATH"/lkm/nomount*-${KVER}.ko; do
+    for mod in "$MODPATH"/lkm/nomount*-${KVER}${ARCH_SFX}.ko; do
       [ -f "$mod" ] || continue
       CANDIDATE="$mod"
       break
